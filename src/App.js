@@ -1,7 +1,14 @@
 import { Add } from "@mui/icons-material";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  orderBy,
+  query,
+  updateDoc,
+} from "firebase/firestore";
 import "./App.css";
 import { useEffect, useState } from "react";
 import { db } from "./config-firebase";
@@ -29,7 +36,10 @@ function App() {
   const handleAddData = async () => {
     setLoading(true);
     const bucketLists = await getDocs(collection(db, "bucketLists"));
-    const memories = await getDocs(collection(db, "memories"));
+    const q = query(collection(db, "memories"), orderBy("date", "asc"));
+    // const memoriesCollection = collection(db, "memories");
+
+    const memories = await getDocs(q);
     const bucketListArr = [];
     const memoriesArr = [];
     bucketLists.forEach((doc) => {

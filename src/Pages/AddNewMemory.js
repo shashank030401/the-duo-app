@@ -35,6 +35,7 @@ const CustomAddFlex = styled(AddFlex)`
 function AddNewMemory({ isEdit }) {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [dataLoading, setDataLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [memory, setMemory] = useState({
     date: format(new Date(), "dd MMM yyyy"),
@@ -92,10 +93,12 @@ function AddNewMemory({ isEdit }) {
   };
 
   const handleSetMemory = async () => {
+    setDataLoading(true);
     const _doc = await getDoc(doc(db, "memories", id));
     if (_doc.exists()) {
       setMemory(_doc.data());
     }
+    setDataLoading(false);
   };
 
   useEffect(() => {
@@ -104,85 +107,99 @@ function AddNewMemory({ isEdit }) {
     }
   }, []);
   return (
-    <AddFlex flexDirection="column" alignItems="flex-end" padding="20px">
-      <CustomAddFlex width="100%" alignItems="center" justify="center">
-        <div className="fixLeft" onClick={handleNavigateBack}>
-          <ArrowBack />
-        </div>
-        <CustomText fontWeight="900" fontSize="30px" color="#E74646">
-          Add a new memory
-        </CustomText>
-      </CustomAddFlex>
-      <AddFlex flexDirection="column" width="100%" margin=" 20px 0">
-        <CustomText>Add Name to your memory. </CustomText>
-        <CustomInput
-          placeholder="Add a name to your memory"
-          value={memory.memoryName ? memory.memoryName : ""}
-          onChange={(e) => handleUpdateMemory("memoryName", e.target.value)}
-        />
-      </AddFlex>
-      <AddFlex flexDirection="column" width="100%" margin="0px 0 20px 0">
-        <CustomText>Describe your memory. </CustomText>
-        <TextEditor
-          placeholder="Describe your memory.."
-          value={memory.memoryDescription ? memory.memoryDescription : ""}
-          getTextEditorInput={(text) =>
-            handleUpdateMemory("memoryDescription", text)
-          }
-        />
-      </AddFlex>
-      <AddFlex flexDirection="column" width="100%">
-        {isEdit && (
-          <Image
-            width="100px"
-            height="100px"
-            url={memory.imgUrl}
-            borderRadius={"10px"}
+    !dataLoading && (
+      <AddFlex flexDirection="column" alignItems="flex-end" padding="20px">
+        <CustomAddFlex width="100%" alignItems="center" justify="center">
+          <div className="fixLeft" onClick={handleNavigateBack}>
+            <ArrowBack />
+          </div>
+          <CustomText fontWeight="900" fontSize="30px" color="#E74646">
+            Add a new memory
+          </CustomText>
+        </CustomAddFlex>
+        <AddFlex flexDirection="column" width="100%" margin=" 20px 0">
+          <CustomText>Add Name to your memory. </CustomText>
+          <CustomInput
+            placeholder="Add a name to your memory"
+            value={memory.memoryName ? memory.memoryName : ""}
+            onChange={(e) => handleUpdateMemory("memoryName", e.target.value)}
           />
-        )}
-        <CustomInput type={"file"} onChange={handleSetFile} />
-      </AddFlex>
-      <AddFlex>
-        {isEdit && (
+        </AddFlex>
+        <AddFlex flexDirection="column" width="100%" margin=" 20px 0">
+          <CustomText>Add Name to your memory. </CustomText>
+          <CustomInput
+            placeholder="Add a date to your memory"
+            type="date"
+            value={memory.date ? memory.date : ""}
+            onChange={(e) => {
+              console.log(e.target.value);
+              handleUpdateMemory("date", e.target.value);
+            }}
+          />
+        </AddFlex>
+        <AddFlex flexDirection="column" width="100%" margin="0px 0 20px 0">
+          <CustomText>Describe your memory. </CustomText>
+          <TextEditor
+            placeholder="Describe your memory.."
+            value={memory.memoryDescription ? memory.memoryDescription : ""}
+            getTextEditorInput={(text) =>
+              handleUpdateMemory("memoryDescription", text)
+            }
+          />
+        </AddFlex>
+        <AddFlex flexDirection="column" width="100%">
+          {isEdit && (
+            <Image
+              width="100px"
+              height="100px"
+              url={memory.imgUrl}
+              borderRadius={"10px"}
+            />
+          )}
+          <CustomInput type={"file"} onChange={handleSetFile} />
+        </AddFlex>
+        <AddFlex>
+          {isEdit && (
+            <CustomButton
+              margin="20px 10px"
+              minWidth="130px"
+              minHeight="40px"
+              background={"#E06469"}
+              onClick={handleDelete}
+              disabled={loading}
+            >
+              {isDeleting ? (
+                <CircularProgress
+                  size="18px"
+                  color="info"
+                  sx={{ color: "black" }}
+                />
+              ) : (
+                <CustomText color="white">Delete memory</CustomText>
+              )}
+            </CustomButton>
+          )}
           <CustomButton
-            margin="20px 10px"
+            margin="20px 0"
             minWidth="130px"
             minHeight="40px"
-            background={"#E06469"}
-            onClick={handleDelete}
+            background={PrimaryActionColor}
+            onClick={handleSubmit}
             disabled={loading}
           >
-            {isDeleting ? (
+            {loading ? (
               <CircularProgress
                 size="18px"
                 color="info"
                 sx={{ color: "black" }}
               />
             ) : (
-              <CustomText color="white">Delete memory</CustomText>
+              <CustomText>{isEdit ? "Update Memory" : "Add Memory"}</CustomText>
             )}
           </CustomButton>
-        )}
-        <CustomButton
-          margin="20px 0"
-          minWidth="130px"
-          minHeight="40px"
-          background={PrimaryActionColor}
-          onClick={handleSubmit}
-          disabled={loading}
-        >
-          {loading ? (
-            <CircularProgress
-              size="18px"
-              color="info"
-              sx={{ color: "black" }}
-            />
-          ) : (
-            <CustomText>Add Memory</CustomText>
-          )}
-        </CustomButton>
+        </AddFlex>
       </AddFlex>
-    </AddFlex>
+    )
   );
 }
 
