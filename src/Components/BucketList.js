@@ -9,6 +9,7 @@ import { CustomText } from "../ReusableStyledComponents/Reusable";
 
 const BucketListHolder = styled.div`
   /* padding: 20px; */
+  width: 100%;
 `;
 
 function BucketList({
@@ -21,10 +22,10 @@ function BucketList({
     handleDialogAction();
   };
   return (
-    <div>
+    <>
       <BucketListHolder>
         {lists.map((list) => (
-          <Accordion>
+          <Accordion sx={{ width: "100%" }} key={list.id}>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel1a-content"
@@ -32,13 +33,7 @@ function BucketList({
             >
               <CustomText>{list.name}</CustomText>
             </AccordionSummary>
-            <AccordionDetails>
-              <CustomText>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                Suspendisse malesuada lacus ex, sit amet blandit leo lobortis
-                eget.
-              </CustomText>
-            </AccordionDetails>
+            <AccordionDetails></AccordionDetails>
           </Accordion>
         ))}
       </BucketListHolder>
@@ -53,7 +48,7 @@ function BucketList({
           />
         }
       />
-    </div>
+    </>
   );
 }
 

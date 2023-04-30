@@ -1,14 +1,19 @@
 import { ArrowForward, ArrowRight } from "@mui/icons-material";
+import { format } from "date-fns";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { AddFlex } from "../App";
-import { CustomButton, CustomText } from "../ReusableStyledComponents/Reusable";
+import {
+  AddFlex,
+  CustomButton,
+  CustomText,
+} from "../ReusableStyledComponents/Reusable";
 
 const MemoryWrapper = styled.div`
   padding: 5px;
   margin-right: 5px;
   border-radius: 5px;
-  background-color: black;
+  /* background-color: black; */
 `;
 
 const Memory = styled.div`
@@ -31,45 +36,52 @@ const CustomAddFlex = styled(AddFlex)`
   overflow-x: scroll;
 `;
 
-function Memories() {
+function Memories({ memoryList }) {
+  const navigate = useNavigate();
+  const handleNavigateToMemory = (id) => {
+    navigate(`/memory/${id}`);
+  };
+
   return (
     <CustomAddFlex>
-      <MemoryWrapper>
-        <Memory
-          url={
-            "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80"
-          }
+      {memoryList.map((memory) => (
+        <MemoryWrapper
+          key={memory.id}
+          onClick={() => handleNavigateToMemory(memory.id)}
         >
-          <AddFlex width="100%">
-            <AddFlex
-              flexDirection="column"
-              alignItems="flex-start"
-              margin="10px"
-              grow="1"
-            >
-              <CustomText
-                fontSize="20px"
-                fontWeight="600"
-                color="white"
-                // margin="10px"
+          <Memory url={memory.imgUrl}>
+            <AddFlex width="100%">
+              <AddFlex
+                flexDirection="column"
+                alignItems="flex-start"
+                margin="10px"
+                grow="1"
               >
-                Memory
-              </CustomText>
-              <CustomText color="white" margin="0">
-                {new Date().getDate()}
-              </CustomText>
+                <CustomText
+                  fontSize="16px"
+                  fontWeight="600"
+                  color="white"
+                  textAlign="left"
+                  // margin="10px"
+                >
+                  {memory.memoryName}
+                </CustomText>
+                <CustomText color="white" margin="0">
+                  {format(new Date(memory.date), "dd MMM yyyy")}
+                </CustomText>
+              </AddFlex>
+              <CustomButton
+                background="transparent"
+                padding="5px"
+                borderRadius="100%"
+                border="none"
+              >
+                <ArrowForward sx={{ color: "white" }} />
+              </CustomButton>
             </AddFlex>
-            <CustomButton
-              background="transparent"
-              padding="5px"
-              borderRadius="100%"
-              border="none"
-            >
-              <ArrowForward sx={{ color: "white" }} />
-            </CustomButton>
-          </AddFlex>
-        </Memory>
-      </MemoryWrapper>
+          </Memory>
+        </MemoryWrapper>
+      ))}
     </CustomAddFlex>
   );
 }

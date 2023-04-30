@@ -6,56 +6,35 @@ import "./App.css";
 import { useEffect, useState } from "react";
 import { db } from "./config-firebase";
 import BucketList from "./Components/BucketList";
-import { CustomText } from "./ReusableStyledComponents/Reusable";
+import { AddFlex, CustomText, Icon } from "./ReusableStyledComponents/Reusable";
 import { HeaderContent, PrimaryActionColor } from "./CONSTANTS";
 import styled from "styled-components";
 import Memories from "./Components/Memories";
+import { useNavigate } from "react-router-dom";
+import { CircularProgress } from "@mui/material";
 
-const Icon = styled.div`
-  position: fixed;
-  transition: all 0.1s ease-in-out;
-  bottom: ${(props) => (props.bottom ? props.bottom : "10px")};
-  transform: ${(props) => props.rotate && "rotate(45deg)"};
-  right: 10px;
-  padding: 10px;
-  display: flex;
-  align-itms: center;
-  justify-content: center;
-  -webkit-box-shadow: ${(props) =>
-    props.showIcon === true && "-1px 3px 14px 0px rgba(0, 0, 0, 0.31)"};
-  -moz-box-shadow: ${(props) =>
-    props.showIcon === true && "-1px 3px 14px 0px rgba(0, 0, 0, 0.31)"};
-  box-shadow: ${(props) =>
-    props.showIcon === true && "-1px 3px 14px 0px rgba(0, 0, 0, 0.31)"};
-  border-radius: 100%;
-  background-color: ${PrimaryActionColor};
-  z-index:${(props) => props.zIndex && props.zIndex}
-  cursor: pointer;
-`;
-
-export const AddFlex = styled.div`
-  display: flex;
-  flex-direction: ${(props) =>
-    props.flexDirection ? props.flexDirection : "row"};
-  padding: ${(props) => props.padding && props.padding};
-  margin: ${(props) => props.margin && props.margin};
-  flex-grow: ${(props) => props.grow && props.grow};
-  width: ${(props) => props.width && props.width};
-
-  align-items: ${(props) => (props.alignItems ? props.alignItems : "row")};
-`;
 function App() {
   const [bucketLists, setBucketLists] = useState([]);
+  const [memoryList, setMemoryList] = useState([]);
   const [isShowIconClicked, setIsShowIconClicked] = useState(false);
   const [isAddBucketListClicked, setIsBucketListClicked] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const handleAddData = async () => {
-    const docs = await getDocs(collection(db, "bucketLists"));
-    const arr = [];
-    docs.forEach((doc) => {
-      arr.push(doc.data());
+    setLoading(true);
+    const bucketLists = await getDocs(collection(db, "bucketLists"));
+    const memories = await getDocs(collection(db, "memories"));
+    const bucketListArr = [];
+    const memoriesArr = [];
+    bucketLists.forEach((doc) => {
+      bucketListArr.push(doc.data());
     });
-    setBucketLists(arr);
-    // setBucketLists(docs);
+    memories.forEach((doc) => {
+      memoriesArr.push(doc.data());
+    });
+    setMemoryList(memoriesArr);
+    setBucketLists(bucketListArr);
+    setLoading(false);
   };
   const handleUpdateBucketLists = (data) => {
     setBucketLists(data);
@@ -63,8 +42,13 @@ function App() {
   const handleAddNewList = () => {
     setIsBucketListClicked(!isAddBucketListClicked);
   };
+
+  const handleNavigateToAddNewMemory = () => {
+    navigate("/add-new-memory");
+  };
   useEffect(() => {
     handleAddData();
+    console.log("hey");
   }, []);
   return (
     <div className="App">
@@ -73,41 +57,68 @@ function App() {
       </CustomText>
       <CustomText>Look who learnt to keep them..❤️</CustomText>
 
-      <Icon
-        bottom={isShowIconClicked && "65px"}
-        showIcon={isShowIconClicked}
-        onClick={handleAddNewList}
-      >
-        <ListAltIcon />
-      </Icon>
-      <Icon bottom={isShowIconClicked && "120px"} showIcon={isShowIconClicked}>
-        <FavoriteIcon />
-      </Icon>
-      <Icon showIcon={true} rotate={isShowIconClicked}>
-        <Add
-          onClick={() => {
-            setIsShowIconClicked(!isShowIconClicked);
-          }}
-        />
-      </Icon>
-      <AddFlex flexDirection="column" alignItems="flex-start" padding="20px">
-        <CustomText fontSize="17px" fontWeight="600" margin="10px 0">
-          Memories
-        </CustomText>
-        <Memories />
-      </AddFlex>
+      {loading ? (
+        <AddFlex
+          flexDirection="column"
+          width="100%"
+          height="80vh"
+          alignItems="center"
+          justify="center"
+        >
+          <CircularProgress color="info" sx={{ color: "black" }} />
+          <CustomText>Hang on, Hang on</CustomText>
+        </AddFlex>
+      ) : (
+        <>
+          <Icon
+            bottom={isShowIconClicked && "65px"}
+            showIcon={isShowIconClicked}
+            onClick={handleAddNewList}
+          >
+            <ListAltIcon />
+          </Icon>
+          <Icon
+            bottom={isShowIconClicked && "120px"}
+            showIcon={isShowIconClicked}
+            onClick={handleNavigateToAddNewMemory}
+          >
+            <FavoriteIcon />
+          </Icon>
+          <Icon showIcon={true} rotate_transform={isShowIconClicked}>
+            <Add
+              onClick={() => {
+                setIsShowIconClicked(!isShowIconClicked);
+              }}
+            />
+          </Icon>
+          <AddFlex
+            flexDirection="column"
+            alignItems="flex-start"
+            padding="20px"
+          >
+            <CustomText fontSize="17px" fontWeight="600" margin="10px 0">
+              Memories
+            </CustomText>
+            <Memories memoryList={memoryList} />
+          </AddFlex>
 
-      <AddFlex flexDirection="column" alignItems="flex-start" padding="20px">
-        <CustomText fontSize="17px" fontWeight="600" margin="10px 0">
-          Bucket Lists
-        </CustomText>
-        <BucketList
-          addBucketListClicked={isAddBucketListClicked}
-          lists={bucketLists}
-          handleDialogAction={handleAddNewList}
-          updateBucketLists={handleUpdateBucketLists}
-        />
-      </AddFlex>
+          <AddFlex
+            flexDirection="column"
+            alignItems="flex-start"
+            padding="20px"
+          >
+            <CustomText fontSize="17px" fontWeight="600" margin="10px 0">
+              Bucket Lists
+            </CustomText>
+            <BucketList
+              addBucketListClicked={isAddBucketListClicked}
+              lists={bucketLists}
+              handleDialogAction={handleAddNewList}
+              updateBucketLists={handleUpdateBucketLists}
+            />
+          </AddFlex>
+        </>
+      )}
     </div>
   );
 }
