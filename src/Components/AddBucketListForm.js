@@ -1,10 +1,19 @@
-import { doc, getDocs, setDoc, collection } from "firebase/firestore";
+import {
+  doc,
+  getDocs,
+  setDoc,
+  collection,
+  updateDoc,
+  FieldValue,
+  getDoc,
+} from "firebase/firestore";
 import React, { useState } from "react";
 import styled from "styled-components";
 import { db } from "../config-firebase";
 import { PrimaryActionColor } from "../CONSTANTS";
 import { CustomButton, CustomText } from "../ReusableStyledComponents/Reusable";
 import { v4 } from "uuid";
+import { CircularProgress } from "@mui/material";
 
 const CustomInputWrapper = styled.div`
   padding: 10px;
@@ -20,15 +29,44 @@ const CustomInput = styled.input`
   font-family: Poppins, "sans-serif";
 `;
 
-function AddBucketListForm({ updateBucketLists, handleDialogAction }) {
+function AddBucketListForm({
+  formTitle,
+  updateBucketLists,
+  formPlaceholder,
+  handleDialogAction,
+  isItemEditClicked,
+  editItemIndex,
+  actionButtonText,
+  id,
+  isAdd,
+}) {
   const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
   const handleSubmit = async () => {
-    const id = v4();
-    const newdata = await setDoc(doc(db, "bucketLists", id), {
-      id: id,
-      name: input,
-      list: [],
-    });
+    setLoading(true);
+    console.log(id);
+    const _id = id && id.length > 0 ? id : v4();
+    console.log(_id);
+    if (isAdd) {
+      const newdata = await setDoc(doc(db, "bucketLists", _id), {
+        id: _id,
+        name: input,
+        list: [],
+      });
+    } else {
+      const newData = await getDoc(doc(db, "bucketLists", _id));
+      var list = newData.data().list;
+      if (isItemEditClicked) {
+        list[editItemIndex] = { ...list[editItemIndex], task: input };
+      } else {
+        list.push({ id: v4(), task: input, checked: false });
+      }
+      console.log(list);
+      await updateDoc(doc(db, "bucketLists", _id), {
+        list: list,
+      });
+      setLoading(false);
+    }
 
     const _collections = await getDocs(collection(db, "bucketLists"));
     const newColl = [];
@@ -45,16 +83,28 @@ function AddBucketListForm({ updateBucketLists, handleDialogAction }) {
     <CustomInputWrapper>
       <label>
         <CustomText fontWeight="500" fontSize="14px" margin="10px 0">
-          Add a name to this bucket list.
+          {formTitle}
         </CustomText>
       </label>
       <CustomInput
         value={input}
         onChange={handleChange}
-        placeholder={"Enter your bucketlist name here"}
+        placeholder={formPlaceholder}
       />
-      <CustomButton background={PrimaryActionColor} onClick={handleSubmit}>
-        <CustomText>Add New Bucket List</CustomText>
+
+      <CustomButton
+        margin="20px 0px"
+        minWidth="130px"
+        minHeight="40px"
+        background={PrimaryActionColor}
+        onClick={handleSubmit}
+        disabled={loading}
+      >
+        {loading ? (
+          <CircularProgress size="18px" color="info" sx={{ color: "black" }} />
+        ) : (
+          <CustomText color="black">{actionButtonText}</CustomText>
+        )}
       </CustomButton>
     </CustomInputWrapper>
   );

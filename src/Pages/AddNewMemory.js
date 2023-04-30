@@ -1,7 +1,7 @@
 import { ArrowBack } from "@mui/icons-material";
 import { CircularProgress } from "@mui/material";
 import { format } from "date-fns";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { deleteDoc, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import { useNavigate, useParams } from "react-router-dom";
@@ -54,7 +54,7 @@ function AddNewMemory({ isEdit }) {
 
   const handleDelete = async () => {
     setIsDeleting(true);
-    await setDoc(doc(db, "memories", id)).then(() => {
+    await deleteDoc(doc(db, "memories", id)).then(() => {
       setIsDeleting(false);
       navigate("/");
     });

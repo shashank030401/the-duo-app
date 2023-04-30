@@ -49,25 +49,27 @@ function Memory() {
             </CustomText>
           </AddFlex>
           <Icon
-            bottom={isShowIconClicked && "65px"}
+            bottom={isShowIconClicked && "75px"}
             showIcon={isShowIconClicked}
             onClick={handleAddEditMemory}
           >
             <Edit />
           </Icon>
           <Icon
-            bottom={isShowIconClicked && "120px"}
+            bottom={isShowIconClicked && "140px"}
             showIcon={isShowIconClicked}
             onClick={handleNavigateToHome}
           >
             <Home />
           </Icon>
-          <Icon showIcon={true} rotate_transform={isShowIconClicked}>
-            <Add
-              onClick={() => {
-                setIsShowIconClicked(!isShowIconClicked);
-              }}
-            />
+          <Icon
+            showIcon={true}
+            rotate_transform={isShowIconClicked}
+            onClick={() => {
+              setIsShowIconClicked(!isShowIconClicked);
+            }}
+          >
+            <Add />
           </Icon>
         </Image>
         <AddFlex margin="10px">

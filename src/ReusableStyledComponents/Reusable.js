@@ -28,7 +28,7 @@ export const Icon = styled.div`
   bottom: ${(props) => (props.bottom ? props.bottom : "10px")};
   transform: ${(props) => (props.rotate_transform ? "rotate(45deg)" : "false")};
   right: 10px;
-  padding: 10px;
+  padding: 15px;
   display: flex;
   align-itms: center;
   justify-content: center;
@@ -40,7 +40,7 @@ export const Icon = styled.div`
     props.showIcon === true && "-1px 3px 14px 0px rgba(0, 0, 0, 0.31)"};
   border-radius: 100%;
   background-color: ${PrimaryActionColor};
-  z-index:${(props) => props.zIndex && props.zIndex}
+  z-index: 11111;
   cursor: pointer;
 `;
 
