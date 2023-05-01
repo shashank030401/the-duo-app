@@ -126,7 +126,7 @@ function AddNewMemory({ isEdit }) {
           />
         </AddFlex>
         <AddFlex flexDirection="column" width="100%" margin=" 20px 0">
-          <CustomText>Add Name to your memory. </CustomText>
+          <CustomText>Add a date to your memory.</CustomText>
           <CustomInput
             placeholder="Add a date to your memory"
             type="date"
